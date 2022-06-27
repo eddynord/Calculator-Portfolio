@@ -1,128 +1,122 @@
-const calculator = document.querySelector('.calculator')
-const keys = calculator.querySelector('.calculator__keys')
-const display = calculator.querySelector('.calculator__display')
-const operatorKeys = keys.querySelectorAll('[data-type="operator"]')
 
-keys.addEventListener('click', event => {
-  if (!event.target.closest('button')) return
+var input = document.getElementById('input'), // input/output button
+  number = document.querySelectorAll('.numbers div'), // number buttons
+  operator = document.querySelectorAll('.operators div'), // operator buttons
+  result = document.getElementById('result'), // equal button
+  clear = document.getElementById('clear'), // clear button
+  resultDisplayed = false; // flag to keep an eye on what output is displayed
 
-  const key = event.target
-  const keyValue = key.textContent
-  const displayValue = display.textContent
-  const { type } = key.dataset
-  const { previousKeyType } = calculator.dataset
+// adding click handlers to number buttons
+for (var i = 0; i < number.length; i++) {
+  number[i].addEventListener("click", function(e) {
 
-  if (type === 'number') {
-    if (
-      displayValue === '0' ||
-      previousKeyType === 'operator'
-    ) {
-      display.textContent = keyValue
+    // storing current input string and its last character in variables - used later
+    var currentString = input.innerHTML;
+    var lastChar = currentString[currentString.length - 1];
+
+    // if result is not diplayed, just keep adding
+    if (resultDisplayed === false) {
+      input.innerHTML += e.target.innerHTML;
+    } else if (resultDisplayed === true && lastChar === "+" || lastChar === "-" || lastChar === "×" || lastChar === "÷") {
+      // if result is currently displayed and user pressed an operator
+      // we need to keep on adding to the string for next operation
+      resultDisplayed = false;
+      input.innerHTML += e.target.innerHTML;
     } else {
-      display.textContent = displayValue + keyValue
+      // if result is currently displayed and user pressed a number
+      // we need clear the input string and add the new input to start the new opration
+      resultDisplayed = false;
+      input.innerHTML = "";
+      input.innerHTML += e.target.innerHTML;
     }
+
+  });
+}
+
+// adding click handlers to number buttons
+for (var i = 0; i < operator.length; i++) {
+  operator[i].addEventListener("click", function(e) {
+
+    // storing current input string and its last character in variables - used later
+    var currentString = input.innerHTML;
+    var lastChar = currentString[currentString.length - 1];
+
+    // if last character entered is an operator, replace it with the currently pressed one
+    if (lastChar === "+" || lastChar === "-" || lastChar === "×" || lastChar === "÷") {
+      var newString = currentString.substring(0, currentString.length - 1) + e.target.innerHTML;
+      input.innerHTML = newString;
+    } else if (currentString.length == 0) {
+      // if first key pressed is an opearator, don't do anything
+      console.log("enter a number first");
+    } else {
+      // else just add the operator pressed to the input
+      input.innerHTML += e.target.innerHTML;
+    }
+
+  });
+}
+
+// on click of 'equal' button
+result.addEventListener("click", function() {
+
+  // this is the string that we will be processing eg. -10+26+33-56*34/23
+  var inputString = input.innerHTML;
+
+  // forming an array of numbers. eg for above string it will be: numbers = ["10", "26", "33", "56", "34", "23"]
+  var numbers = inputString.split(/\+|\-|\×|\÷/g);
+
+  // forming an array of operators. for above string it will be: operators = ["+", "+", "-", "*", "/"]
+  // first we replace all the numbers and dot with empty string and then split
+  var operators = inputString.replace(/[0-9]|\./g, "").split("");
+
+  console.log(inputString);
+  console.log(operators);
+  console.log(numbers);
+  console.log("----------------------------");
+
+  // now we are looping through the array and doing one operation at a time.
+  // first divide, then multiply, then subtraction and then addition
+  // as we move we are alterning the original numbers and operators array
+  // the final element remaining in the array will be the output
+
+  var divide = operators.indexOf("÷");
+  while (divide != -1) {
+    numbers.splice(divide, 2, numbers[divide] / numbers[divide + 1]);
+    operators.splice(divide, 1);
+    divide = operators.indexOf("÷");
   }
 
-  if (type === 'operator') {
-    operatorKeys.forEach(el => { el.dataset.state = '' })
-    key.dataset.state = 'selected'
-
-    calculator.dataset.firstNumber = displayValue
-    calculator.dataset.operator = key.dataset.key
+  var multiply = operators.indexOf("×");
+  while (multiply != -1) {
+    numbers.splice(multiply, 2, numbers[multiply] * numbers[multiply + 1]);
+    operators.splice(multiply, 1);
+    multiply = operators.indexOf("×");
   }
 
-  if (type === 'equal') {
-    // Perform a calculation
-    const firstNumber = calculator.dataset.firstNumber
-    const operator = calculator.dataset.operator
-    const secondNumber = displayValue
-    display.textContent = calculate(firstNumber, operator, secondNumber)
+  var subtract = operators.indexOf("-");
+  while (subtract != -1) {
+    numbers.splice(subtract, 2, numbers[subtract] - numbers[subtract + 1]);
+    operators.splice(subtract, 1);
+    subtract = operators.indexOf("-");
   }
 
-  if (type === 'clear') {
-    display.textContent = '0'
-    delete calculator.dataset.firstNumber
-    delete calculator.dataset.operator
+  var add = operators.indexOf("+");
+  while (add != -1) {
+    // using parseFloat is necessary, otherwise it will result in string concatenation :)
+    numbers.splice(add, 2, parseFloat(numbers[add]) + parseFloat(numbers[add + 1]));
+    operators.splice(add, 1);
+    add = operators.indexOf("+");
   }
 
-  calculator.dataset.previousKeyType = type
+  input.innerHTML = numbers[0]; // displaying the output
+
+  resultDisplayed = true; // turning flag if result is displayed
+});
+
+// clearing the input on press of clear
+clear.addEventListener("click", function() {
+  input.innerHTML = "";
 })
 
-function calculate (firstNumber, operator, secondNumber) {
-  firstNumber = parseInt(firstNumber)
-  secondNumber = parseInt(secondNumber)
 
-  if (operator === 'plus') return firstNumber + secondNumber
-  if (operator === 'minus') return firstNumber - secondNumber
-  if (operator === 'times') return firstNumber * secondNumber
-  if (operator === 'divide') return firstNumber / secondNumber
-}
 
-// ========================
-// TESTING
-// ========================
-function clearCalculator () {
-  // Press the clear key
-  const clearKey = document.querySelector('[data-type="clear"]')
-  clearKey.click()
-
-  // Clear operator states
-  operatorKeys.forEach(key => { key.dataset.state = '' })
-}
-
-function testClearKey () {
-  clearCalculator()
-  console.assert(display.textContent === '0', 'Clear key. Display should be 0')
-  console.assert(!calculator.dataset.firstNumber, 'Clear key. No first number remains')
-  console.assert(!calculator.dataset.operator, 'Clear key. No operator remains')
-}
-
-function testKeySequence (test) {
-  // Press keys
-  test.keys.forEach(key => {
-    document.querySelector(`[data-key="${key}"]`).click()
-  })
-
-  // Assertion
-  console.assert(display.textContent === test.value, test.message)
-
-  // Clear calculator
-  clearCalculator()
-  testClearKey()
-}
-
-const tests = [{
-  keys: ['1'],
-  value: '1',
-  message: 'Click 1'
-}, {
-  keys: ['1', '5'],
-  value: '15',
-  message: 'Click 15'
-}, {
-  keys: ['1', '5', '9'],
-  value: '159',
-  message: 'Click 159'
-}, {
-  keys: ['2', '4', 'plus', '7', 'equal'],
-  value: '31',
-  message: 'Calculation with plus'
-}, {
-  keys: ['3', 'minus', '7', '0', 'equal'],
-  value: '-67',
-  message: 'Calculation with minus'
-}, {
-  keys: ['1', '5', 'times', '9', 'equal'],
-  value: '135',
-  message: 'Calculation with times'
-}, {
-  keys: ['9', 'divide', '3', 'equal'],
-  value: '3',
-  message: 'Calculation with divide'
-}, {
-  keys: ['9', 'divide', '0', 'equal'],
-  value: 'Infinity',
-  message: 'Calculation. Divide by 0'
-}]
-
-tests.forEach(testKeySequence)

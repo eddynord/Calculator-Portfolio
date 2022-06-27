@@ -1,12 +1,12 @@
-var input = document.querySelector('.form-control');
-numberKey = document.querySelector('.g-col-6');
-operators = document.getElementById('operator');
-equal = document.getElementById('equal');
-clearBtn = document.getElementById('clear');
-displayedResult = false;
+var input = document.getElementById('typeNumber');
+    numberKey = document.querySelectorAll('.grid div');
+    operators = document.querySelectorAll('.operator');
+    equal = document.getElementById('equal');
+    clearBtn = document.getElementById('clear');
+    displayedResult = false;
 
 for(var i = 0 ; i < numberKey.length; i++) {
-    numberKey[i].add.EventListener('click', function(e) {
+    numberKey[i].addEventListener('click', function(e) {
         var currentString = input.innerHTML;
         var lastChar = currentString[currentString.length - 1];
 
@@ -23,6 +23,27 @@ for(var i = 0 ; i < numberKey.length; i++) {
     });
 }
 
+for (var i = 0; i < operators.length; i++) {
+    operators[i].addEventListener("click", function(e) {
+  
+      // storing current input string and its last character in variables - used later
+      var currentString = input.innerHTML;
+      var lastChar = currentString[currentString.length - 1];
+  
+      // if last character entered is an operator, replace it with the currently pressed one
+      if (lastChar === "+" || lastChar === "-" || lastChar === "x" || lastChar === "÷") {
+        var newString = currentString.substring(0, currentString.length - 1) + e.target.innerHTML;
+        input.innerHTML = newString;
+      } else if (currentString.length == 0) {
+        // if first key pressed is an opearator, don't do anything
+        console.log("enter a number first");
+      } else {
+        // else just add the operator pressed to the input
+        input.innerHTML += e.target.innerHTML;
+      }
+  
+    });
+  }
     equal.addEventListener("click" , function() {
         var inputString = input.innerHTML;
         var numbers = inputString.split(/\+|\-|\×|\÷/g);
@@ -33,33 +54,33 @@ for(var i = 0 ; i < numberKey.length; i++) {
         console.log(numbers);
         console.log("----------------------------");
 
-        var divide = operators.indexOf("÷");
+        var divide = operator.indexOf("÷");
             while (divide != -1) {
                 numbers.splice(divide, 2, numbers[divide] / numbers[divide + 1]);
                 operator.splice(divide, 1);
-                divide = operators.indexOf("÷");
+                divide = operator.indexOf("÷");
     }
 
-        var multiply = operators.indexOf("×");
+        var multiply = operator.indexOf("×");
             while (multiply != -1) {
                 numbers.splice(multiply, 2, numbers[multiply] * numbers[multiply + 1]);
                 operator.splice(multiply, 1);
-                multiply = operators.indexOf("×");
+                multiply = operator.indexOf("×");
     }
 
-    var subtract = operators.indexOf("-");
+    var subtract = operator.indexOf("-");
             while (subtract != -1) {
                 numbers.splice(subtract, 2, numbers[subtract] - numbers[subtract + 1]);
                 operator.splice(subtract, 1);
-                subtract = operators.indexOf("-");
+                subtract = operator.indexOf("-");
     }
 
-    var add = operators.indexOf("+");
+    var add = operator.indexOf("+");
     while (add != -1) {
         // using parseFloat is necessary, otherwise it will result in string concatenation :)
         numbers.splice(add, 2, parseFloat(numbers[add]) + parseFloat(numbers[add + 1]));
         operator.splice(add, 1);
-        add = operators.indexOf("+");
+        add = operator.indexOf("+");
     }
 
     input.innerHTML = numbers[0]; // displaying the output
@@ -68,7 +89,7 @@ for(var i = 0 ; i < numberKey.length; i++) {
     });
 
     // clearing the input on press of clear
-    clear.addEventListener("click", function() {
+    clearBtn.addEventListener("click", function() {
     input.innerHTML = "";
 
 })
