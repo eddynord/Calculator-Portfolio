@@ -29,7 +29,7 @@ body {
     border-radius: 30px;
     padding-top: 70px;
     padding-bottom: 70px;
-    background-image: linear-gradient(to right, white, black);
+    background-image: linear-gradient(to right, white, rgb(131, 131, 131));
     
 }
 .grid {
@@ -44,31 +44,28 @@ body {
 
 
 
-.g-col-6 button {
-    width: 75px;
-    background-color: rgb(15, 15, 15);
-    border: thin solid transparent;
-    box-shadow: 2px 3px rgb(224, 224, 224);
-    text-align: center;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    color: #ffffff;
-    font-size: 32px;
+
+
+.g-col-6 {
+    background-color: #ffffff;
+    padding: 20px 30px;
+    color: #000000;
     cursor: pointer;
     border-radius: 6px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
-#times button,
-#plus button,
-#minus button,
-#divide button {
+#equal {
+    padding: 10px 210px;
+    text-align: center;
     background-color: #ffffff;
-    color: #000000;
+    box-shadow: 2px 3px rgb(224, 224, 224);
 }
 
-.g-col-6 button:hover {
+.g-col-6:hover {
     transition: 0.5s;
-    color: #000000;
-    background-color: #ffffff;
+    color: #ff0000;
+    background-color: #000000;
 
 }
 
@@ -101,10 +98,6 @@ input::-webkit-inner-spin-button {
   margin: 0;
 }
 
-#equal {
-    width: 450px;
-    background-image: linear-gradient(to right, black, white);
-}
 
 
    
